@@ -197,7 +197,8 @@ function escapeAttr(value) {
 }
 
 function escapeRegExp(value) {
-  return String(value).replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  const specials = new Set(["\\", "^", "$", ".", "*", "+", "?", "(", ")", "[", "]", "{", "}", "|"]);
+  return String(value).split("").map((char) => specials.has(char) ? `\\${char}` : char).join("");
 }
 
 window.JRA_G1_DATA_READY
