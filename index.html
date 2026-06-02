@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>&#26085;&#26412;&#36093;&#39340; G1 &#20896;&#36557;&#26597;&#35426;</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <img src="track.svg" alt="" class="track-mark">
+      <div>
+        <h1>&#26085;&#26412;&#36093;&#39340; G1 &#20896;&#36557;&#26597;&#35426;</h1>
+        <p>1960-2025 JRA G1 Winners</p>
+      </div>
+    </div>
+    <div class="summary" aria-label="&#36039;&#26009;&#25688;&#35201;">
+      <span><strong id="yearCount">0</strong> &#24180;&#20221;</span>
+      <span><strong id="raceCount">0</strong> &#36093;&#20107;</span>
+      <span><strong id="recordCount">0</strong> &#31558;&#32080;&#26524;</span>
+    </div>
+  </header>
+
+  <main>
+    <section class="filters" aria-label="&#26597;&#35426;&#26781;&#20214;">
+      <label>
+        <span>&#25628;&#23563;</span>
+        <input id="searchInput" type="search" autocomplete="off" placeholder="&#39340;&#21517;&#12289;&#33521;&#25991;&#21517;&#12289;&#24180;&#20221;&#25110;&#36093;&#20107;">
+      </label>
+      <label>
+        <span>&#24180;&#20221;</span>
+        <select id="yearSelect"></select>
+      </label>
+      <label>
+        <span>&#36093;&#20107;</span>
+        <select id="raceSelect"></select>
+      </label>
+      <div class="toggle-group" role="group" aria-label="&#39023;&#31034;&#27169;&#24335;">
+        <button class="mode-button is-active" type="button" data-view="results">&#32080;&#26524;</button>
+        <button class="mode-button" type="button" data-view="matrix">&#30697;&#38499;</button>
+      </div>
+      <button id="resetButton" type="button" class="icon-button" title="&#37325;&#35373;&#31621;&#36984;" aria-label="&#37325;&#35373;&#31621;&#36984;">&#8634;</button>
+    </section>
+
+    <section class="quick-years" aria-label="&#24555;&#36895;&#24180;&#20221;">
+      <button type="button" data-year="2025">2025</button>
+      <button type="button" data-year="2024">2024</button>
+      <button type="button" data-year="2023">2023</button>
+      <button type="button" data-year="2022">2022</button>
+      <button type="button" data-year="all">&#20840;&#37096;</button>
+    </section>
+
+    <section class="status-row" aria-live="polite">
+      <div id="resultStatus">0</div>
+      <div id="highlightStatus"></div>
+    </section>
+
+    <section id="resultsView" class="view">
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>&#24180;&#20221;</th>
+              <th>&#36093;&#20107;</th>
+              <th>&#20896;&#36557;&#39340;</th>
+              <th>&#33521;&#25991;&#21517;</th>
+            </tr>
+          </thead>
+          <tbody id="resultsBody"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section id="matrixView" class="view is-hidden">
+      <div class="matrix-shell">
+        <table id="matrixTable"></table>
+      </div>
+    </section>
+  </main>
+
+  <script src="data.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
