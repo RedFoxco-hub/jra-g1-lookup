@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 360" role="img" aria-label="Racecourse">
+  <defs>
+    <linearGradient id="grass" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#367553"/>
+      <stop offset="1" stop-color="#b9c66b"/>
+    </linearGradient>
+    <linearGradient id="sand" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#d9c68d"/>
+      <stop offset="1" stop-color="#af8f54"/>
+    </linearGradient>
+  </defs>
+  <rect width="720" height="360" fill="url(#grass)"/>
+  <path d="M163 68h394c86 0 136 52 136 112s-50 112-136 112H163C77 292 27 240 27 180S77 68 163 68Z" fill="url(#sand)" opacity=".94"/>
+  <path d="M176 105h368c59 0 94 35 94 75s-35 75-94 75H176c-59 0-94-35-94-75s35-75 94-75Z" fill="#386b4a"/>
+  <path d="M167 83h386c76 0 119 45 119 97s-43 97-119 97H167C91 277 48 232 48 180S91 83 167 83Z" fill="none" stroke="#fff7df" stroke-width="9"/>
+  <path d="M170 118h360c51 0 80 29 80 62s-29 62-80 62H170c-51 0-80-29-80-62s29-62 80-62Z" fill="none" stroke="#fff7df" stroke-width="4" opacity=".75"/>
+  <g transform="translate(559 74) rotate(90)">
+    <rect width="52" height="10" fill="#fbfbfb"/>
+    <rect x="0" width="6.5" height="10" fill="#222"/>
+    <rect x="13" width="6.5" height="10" fill="#222"/>
+    <rect x="26" width="6.5" height="10" fill="#222"/>
+    <rect x="39" width="6.5" height="10" fill="#222"/>
+  </g>
+  <circle cx="151" cy="178" r="8" fill="#c42126"/>
+  <circle cx="181" cy="164" r="8" fill="#f6d64a"/>
+  <circle cx="209" cy="188" r="8" fill="#2d6cdf"/>
+</svg>
