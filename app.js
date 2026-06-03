@@ -32,6 +32,7 @@ const els = {
 };
 
 function init() {
+  repairYears();
   els.yearCount.textContent = data.years.length;
   els.raceCount.textContent = data.races.length;
   els.recordCount.textContent = data.records.length;
@@ -94,6 +95,22 @@ function filteredRecords() {
     if (!query) return true;
     return matchesQuery(record, query);
   });
+}
+
+function repairYears() {
+  const years = Array.from({ length: 66 }, (_, index) => 2025 - index);
+  const raceOrder = new Map(data.races.map((race, index) => [race, index]));
+  let rowIndex = 0;
+  let previousRaceIndex = -1;
+
+  for (const record of data.records) {
+    const raceIndex = raceOrder.get(record.race) ?? 0;
+    if (raceIndex <= previousRaceIndex) rowIndex += 1;
+    record.year = years[rowIndex] ?? record.year;
+    previousRaceIndex = raceIndex;
+  }
+
+  data.years = years;
 }
 
 function render() {
