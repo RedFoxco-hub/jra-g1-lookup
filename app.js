@@ -92,8 +92,7 @@ function filteredRecords() {
     if (state.year !== "all" && String(record.year) !== state.year) return false;
     if (state.race !== "all" && record.race !== state.race) return false;
     if (!query) return true;
-    const haystack = normalize([record.year, record.race, record.horse, record.horseZh, record.horseEn].join(" "));
-    return haystack.includes(query);
+    return matchesQuery(record, query);
   });
 }
 
@@ -173,6 +172,80 @@ function syncQuickYears() {
 
 function normalize(value) {
   return String(value || "").toLocaleLowerCase("zh-Hant").replace(/[\u2018\u2019']/g, "'").trim();
+}
+
+function normalizeLoose(value) {
+  return normalize(value).normalize("NFKC").replace(/[\s\-_'().,\uFF0C\u3002\u30FB\u3001\uFF08\uFF09]/g, "");
+}
+
+function matchesQuery(record, query) {
+  const haystack = normalize([record.year, record.race, record.horse, record.horseZh, record.horseEn].join(" "));
+  if (haystack.includes(query)) return true;
+
+  const compactHaystack = normalizeLoose(haystack);
+  const compactQuery = normalizeLoose(query);
+  if (compactQuery && compactHaystack.includes(compactQuery)) return true;
+
+  const terms = query.split(/\s+/).map(normalizeLoose).filter(Boolean);
+  if (!terms.length) return true;
+  const tokens = haystack.split(/[\s\-_'().,\uFF0C\u3002\u30FB\u3001\uFF08\uFF09]+/).map(normalizeLoose).filter(Boolean);
+  return terms.every((term) => fuzzyTermMatches(term, compactHaystack, tokens));
+}
+
+function fuzzyTermMatches(term, compactHaystack, tokens) {
+  if (compactHaystack.includes(term)) return true;
+  if (term.length >= 3 && isSubsequence(term, compactHaystack)) return true;
+  if (term.length < 3) return false;
+
+  const allowed = term.length <= 4 ? 1 : term.length <= 8 ? 2 : 3;
+  return tokens.some((token) => {
+    if (token.includes(term)) return true;
+    if (term.includes(token) && token.length >= 3) return true;
+    return closestEditDistance(term, token, allowed) <= allowed;
+  });
+}
+
+function isSubsequence(needle, haystack) {
+  let index = 0;
+  for (const char of haystack) {
+    if (char === needle[index]) index += 1;
+    if (index === needle.length) return true;
+  }
+  return false;
+}
+
+function closestEditDistance(needle, token, limit) {
+  if (Math.abs(needle.length - token.length) > limit && !token.includes(needle)) {
+    const windowSize = needle.length;
+    let best = limit + 1;
+    for (let start = 0; start <= token.length - Math.max(1, windowSize - limit); start += 1) {
+      const candidate = token.slice(start, start + windowSize);
+      best = Math.min(best, editDistance(needle, candidate, limit));
+      if (best <= limit) return best;
+    }
+    return best;
+  }
+  return editDistance(needle, token, limit);
+}
+
+function editDistance(a, b, limit) {
+  if (Math.abs(a.length - b.length) > limit) return limit + 1;
+  let previous = Array.from({ length: b.length + 1 }, (_, index) => index);
+
+  for (let i = 1; i <= a.length; i += 1) {
+    const current = [i];
+    let rowBest = current[0];
+    for (let j = 1; j <= b.length; j += 1) {
+      const cost = a[i - 1] === b[j - 1] ? 0 : 1;
+      const value = Math.min(previous[j] + 1, current[j - 1] + 1, previous[j - 1] + cost);
+      current[j] = value;
+      rowBest = Math.min(rowBest, value);
+    }
+    if (rowBest > limit) return limit + 1;
+    previous = current;
+  }
+
+  return previous[b.length];
 }
 
 function highlight(value) {
