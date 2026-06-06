@@ -32,6 +32,7 @@ const els = {
 };
 
 function init() {
+  normalizeHorseNames();
   repairYears();
   els.yearCount.textContent = data.years.length;
   els.raceCount.textContent = data.races.length;
@@ -95,6 +96,22 @@ function filteredRecords() {
     if (!query) return true;
     return matchesQuery(record, query);
   });
+}
+
+function normalizeHorseNames() {
+  for (const record of data.records) {
+    const parsed = splitHorse(record.horse);
+    record.horse = parsed.display;
+    record.horseZh = parsed.zh;
+    record.horseEn = parsed.en;
+  }
+}
+
+function splitHorse(value) {
+  const match = String(value || "").match(/^(.*?)\s*[\(（](.*?)[\)）]\s*$/);
+  return match
+    ? { display: value, zh: match[1].trim(), en: match[2].trim() }
+    : { display: value, zh: value || "", en: "" };
 }
 
 function repairYears() {
