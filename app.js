@@ -103,15 +103,35 @@ function normalizeHorseNames() {
     const parsed = splitHorse(record.horse);
     record.horse = parsed.display;
     record.horseZh = parsed.zh;
+    record.horseJa = parsed.ja;
     record.horseEn = parsed.en;
+    record.hasChinese = parsed.hasChinese;
   }
 }
 
 function splitHorse(value) {
-  const match = String(value || "").match(/^(.*?)\s*[\(（](.*?)[\)）]\s*$/);
-  return match
-    ? { display: value, zh: match[1].trim(), en: match[2].trim() }
-    : { display: value, zh: value || "", en: "" };
+  const match = String(value || "").match(/^(.*)\s*(\(|（)(.*?)(\)|）)\s*$/);
+  if (!match) {
+    return { display: value, zh: "", ja: value || "", en: "", hasChinese: false };
+  }
+
+  const name = match[1].trim();
+  const inner = match[3].trim();
+  if (match[2] === "（" && inner.includes("/")) {
+    const slash = inner.lastIndexOf("/");
+    return {
+      display: value,
+      zh: name,
+      ja: inner.slice(0, slash).trim(),
+      en: inner.slice(slash + 1).trim(),
+      hasChinese: true,
+    };
+  }
+
+  if (match[2] === "（") {
+    return { display: value, zh: name, ja: "", en: inner, hasChinese: true };
+  }
+  return { display: value, zh: "", ja: name, en: inner, hasChinese: false };
 }
 
 function repairYears() {
@@ -153,14 +173,15 @@ function renderResults(records) {
   els.resultsBody.innerHTML = records
     .sort((a, b) => b.year - a.year || data.races.indexOf(a.race) - data.races.indexOf(b.race))
     .map((record) => {
-      const zh = record.horseZh || record.horse;
+      const mainName = record.horseZh || record.horseJa || record.horse;
+      const subtitle = record.hasChinese ? record.horseJa : "";
       const en = record.horseEn || "";
       return `<tr>
         <td class="year-cell">${record.year}</td>
         <td class="race-cell">${highlight(record.race)}</td>
         <td>
-          <div class="horse-main">${highlight(zh)}</div>
-          ${en ? `<div class="horse-sub">${highlight(record.horse)}</div>` : ""}
+          <div class="horse-main">${highlight(mainName)}</div>
+          ${subtitle ? `<div class="horse-sub">${highlight(subtitle)}</div>` : ""}
         </td>
         <td>${en ? highlight(en) : ""}</td>
       </tr>`;
@@ -181,7 +202,7 @@ function renderMatrix(records) {
         const key = `${year}|${race}`;
         const record = byKey.get(key);
         if (!record || !allowed.has(key)) return "<td></td>";
-        return `<td>${highlight(record.horse)}</td>`;
+        return `<td>${highlight(record.horseZh || record.horseJa || record.horse)}</td>`;
       });
       return `<tr><td class="year-cell">${year}</td>${cells.join("")}</tr>`;
     })
@@ -213,7 +234,7 @@ function normalizeLoose(value) {
 }
 
 function matchesQuery(record, query) {
-  const haystack = normalize([record.year, record.race, record.horse, record.horseZh, record.horseEn].join(" "));
+  const haystack = normalize([record.year, record.race, record.horse, record.horseZh, record.horseJa, record.horseEn].join(" "));
   if (haystack.includes(query)) return true;
 
   const compactHaystack = normalizeLoose(haystack);
@@ -317,3 +338,4 @@ window.JRA_G1_DATA_READY
     console.error(error);
     document.body.innerHTML = `<main><div class="empty">${escapeHtml(error.message)}</div></main>`;
   });
+
